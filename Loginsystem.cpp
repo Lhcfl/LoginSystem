@@ -51,7 +51,7 @@ void getPassword(string *s,int MAXLEN=16){
         }
     }
 }
-void getUsername(string *s,int MAXLEN=16){
+void getUsername(string *s,int MAXLEN=32){
     char p;
     char a[500];
     int i=0;
@@ -106,11 +106,20 @@ int login(){
 		return 2;
 	}
 	fin.close();
-	string username,password;
-	cout<<"Username:";
-	getUsername(&username);
-	cout<<"Password:";
-	getPassword(&password);
+	// Read in users final
+	string username="",password="";
+	while(username==""){
+		cout<<"Username:";
+		getUsername(&username);
+		if(name2user.count(username)==0){
+			cout<<"User name does not exists.Please sign up sirst."<<endl;
+			username="";
+		}
+	}
+	while(password==""){
+		cout<<"Password:";
+		getPassword(&password);
+	}
 	USER tmp_user=name2user[username];
 	if(tmp_user.pswd==password && password!=""){
 		USER_NOW=tmp_user;
@@ -142,14 +151,14 @@ int signup(){
 		ofstream fout;
 		fout.open((dir+"\\data\\user").c_str(),ios::app);
 		cout<<"Do not use spaces in username and password\n";
-AGAIN1:
 		string username="",password="",pswd_2="";
+AGAIN1:
 		while(username==""){
 			cout<<"Username:";
 			getUsername(&username);
 			if(name2user.count(username)!=0){
 				cout<<"User name already exists."<<endl;
-				goto AGAIN1;
+				username="";
 			}
 		}
 		while(password==""){
@@ -223,8 +232,10 @@ void Aboutme(){
 	return;
 }
 int main(){
+	//APP name and version
 	APP.name="LoginSystem";
     APP.ver="Alpha";
+    //self check
 	char tmp_dir[200];  
     GetCurrentDirectory(200,tmp_dir);
     dir=tmp_dir;
@@ -238,6 +249,9 @@ int main(){
     	system("pause");
     	return 0;
     }
+
+    //start login
+
     load("Hello!");
     cout<<"Please login or sign up.\nEnter 'l' to login and 's' to sign up.\n";
     int Login_return;
@@ -250,13 +264,16 @@ int main(){
     		goto SIGNUP;
     	}
     }
+
 LOGIN:    
 	system("cls");
 	load("Login");
     Login_return=login();
     switch(Login_return){
     	case 0:
-    		cout<<"Login failed!\n";
+    		cout<<"\nLogin failed!\n\n";
+    		system("pause");
+    		return 0;
     		break;
     	case 1:
     		cout<<"Login success!\n";
@@ -275,11 +292,13 @@ SIGNUP:
     load("Sign up");
     signup();
     cout<<"Success!\n";
+    goto LOGINED;
+    return 0;
 LOGINED: 
 	Logined=true;
 	_sleep(2000);
 	system("cls");
-	load("");
+	load("Welcome");
 	Aboutme();
     system("pause");
     return 0;
